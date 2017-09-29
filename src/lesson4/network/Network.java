@@ -7,11 +7,13 @@ public class Network {
         private String name;
         private ArrayList<Member> friends;
 
-        Member(String name){
+        public Member(String name){
             this.name = name;
             this.friends = new ArrayList<>();
         }
+
         public void leave(){
+            members.remove(this);//outer가 생략된 상태
 
         }
     }
@@ -19,6 +21,7 @@ public class Network {
     private ArrayList<Member> members = new ArrayList<>();
 
     public Member enroll(String name){
+        //this == new Network() == net1 == newMember.outer
         Member newMember = new Member(name);
         members.add(newMember);
         return newMember;
