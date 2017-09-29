@@ -1,0 +1,1 @@
+package lesson4.Sample;public class Imported {    static public String getText(){        return "static method";    }}
