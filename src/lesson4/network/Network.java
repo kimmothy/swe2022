@@ -13,8 +13,12 @@ public class Network {
         }
 
         public void leave(){
-            members.remove(this);//outer가 생략된 상태
+            unenroll(this);//outer가 생략된 상태
+            //members.remove(this); 이렇게 쓰면 캡슐화를 어긴 상태
 
+        }
+        public boolean belongsTo(Network n){
+            return Network.this == n;
         }
     }
     //Netwokrk----------------------------------------------
@@ -22,11 +26,11 @@ public class Network {
 
     public Member enroll(String name){
         //this == new Network() == net1 == newMember.outer
-        Member newMember = new Member(name);
+        Member newMember = this.new Member(name);
         members.add(newMember);
         return newMember;
     }
-    public void remove(Member member){
+    public void unenroll(Member member){
         members.remove(member);
     }
 }
