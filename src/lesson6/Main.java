@@ -40,12 +40,14 @@ public class Main {
         };
         Comparator<String> comp1 = new LengthComparator();
         Comparator<String> comp2 = (f, s)-> f.length() - s.length();
+        comp1.compare("d","d");
         comp2.compare("d","d");
 
         Employee me = new Employee(100), you = new Employee(200);
         Employee[] members = {me, you};
         Arrays.sort(members, new EmployeeComparator());
         Comparator<Employee> f = (g, s)->(g.salary - s.salary);
+
 
 
         }
