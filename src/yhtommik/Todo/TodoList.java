@@ -1,28 +1,40 @@
 package yhtommik.Todo;
 
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.ArrayList;
+import java.util.Scanner;
 
 public class TodoList {
-    static private ArrayList<String> names = new ArrayList<>();
-
+    private enum SortFactor {BASIC, NAME, LIMIT, ADDED_DATE, IS_COMPLETED, IN_MY_DAY};
+    private SortFactor sortFactor;
     private String name;
-
     private ArrayList<TodoTask> tasks;
-
     private TodoTheme theme;
+    private boolean hideCompleted;
+
 
     public TodoList(String name){
         this.name = name;
-        names.add(this.name);
-        theme = new TodoTheme("blue", "mountains");
+        theme = new TodoTheme();
         tasks = new ArrayList<>();
+        sortFactor = SortFactor.BASIC;
     }
+
+    public ArrayList<TodoTask> getList( ) {
+        ArrayList<TodoTask> copiedList = new ArrayList<>(tasks);
+        sort(copiedList);
+        if (hideCompleted){ copiedList.removeIf(x -> x.isCompleted); }
+        return copiedList;
+    }
+
     public void setName(String name){
         if (name.equals(this.name)) return;
-        names.remove(this.name);
         this.name = name;
-        names.add(this.name);
+    }
+
+    public void setTheme(){
+        theme.setTheme();
     }
 
     public TodoTask addTask(String name){
@@ -31,49 +43,94 @@ public class TodoList {
         return newTask;
     }
 
-    public void setTheme(String color, String image){
-        theme.setColor(color);
-        theme.setImage(image);
+    public void setSortFactor() {
+        for (SortFactor sortFactor : SortFactor.values()){//사용자에게 정렬 기준의 목록을 보여주고 선택받음
+            System.out.println(sortFactor);
+        }
+        System.out.println(("무엇으로?"));
+        Scanner scanner = new Scanner(System.in);
+        String sortFactor = scanner.nextLine().toUpperCase();
+
+        this.sortFactor = SortFactor.valueOf(sortFactor);
     }
 
-    public void sort(String factor){
-        if ("addedDate".equals(factor)){
-            tasks.sort((x, y) -> {
-                        if (x.addedDate.isBefore(y.addedDate)) return 1;
-                         else if (x.addedDate.isAfter(y.addedDate)) return -1;
-                         else return 0;
-            });
+    public void toggleHideCompleted() {
+        if (hideCompleted){
+            hideCompleted = false;}
+        else {
+            hideCompleted = true;}
+    }
 
-        }
-        else if ("name".equals(factor)){
-            tasks.sort((x,y) -> x.name.compareTo(y.name));
-        }
-        else if ("limit".equals(factor)){
-            tasks.sort((x,y) ->  {
-                if (x.limit.isBefore(y.limit)) return 1;
-                else if (x.limit.isAfter(y.limit)) return -1;
-                else return 0;
-            });
-        }
-        else if ("myDay".equals(factor))
-            tasks.sort((x,y) -> {
-                if (x.myDay && !y.myDay) return 1;
-                else if (!x.myDay && y.myDay) return -1;
-                else return 0;
-
-            });
+    public void sort(ArrayList<TodoTask> tasks){
+        tasks.sort(TodoTask::compareTo);
     }
 
 
     class TodoTask {
         private String name;
-        private boolean myDay;
+        private boolean inMyDay;
+        private boolean isCompleted;
         private LocalDate limit;
         private LocalDate addedDate;
+        private LocalDate alarmDate;
+        private LocalTime alarmTime;
 
         private TodoTask(String name){
             this.name = name;
             addedDate = LocalDate.now();
+            isCompleted = false;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public int compareTo (TodoTask other) {
+
+            if (sortFactor == SortFactor.ADDED_DATE) {
+                if (this.addedDate.isBefore(other.addedDate)) {
+                    return 1;
+                } else if (this.addedDate.isAfter(other.addedDate)) {
+                    return -1;
+                } else {
+                    return 0;
+                }
+
+            } else if (sortFactor == SortFactor.NAME) {
+                return this.name.compareTo(other.name);
+
+            } else if (sortFactor == SortFactor.LIMIT) {
+                if (this.limit.isBefore(other.limit)) {
+                    return 1;
+                } else if (this.limit.isAfter(other.limit)) {
+                    return -1;
+                } else return 0;
+
+            } else if (sortFactor == SortFactor.IN_MY_DAY) {
+                if (this.inMyDay && !other.inMyDay) {
+                    return 1;
+                } else if (!this.inMyDay && other.inMyDay) {
+                    return -1;
+                } else return 0;
+            }
+
+            else if (sortFactor == SortFactor.IS_COMPLETED) {
+                if (this.isCompleted && !other.isCompleted) {
+                    return 1;
+                } else if (!this.isCompleted && other.isCompleted) {
+                    return -1;
+                } else return 0;
+            }
+
+            else {//sortFactor가 BASIC일 때(사용자가 정렬 방식을 입력하지 않았을 때)
+                if (this.addedDate.isBefore(other.addedDate)) {
+                    return -1;
+                } else if (this.addedDate.isAfter(other.addedDate)) {
+                    return 1;
+                } else {
+                    return 0;
+                }
+            }
         }
 
         public void setName(String name) {
@@ -84,12 +141,23 @@ public class TodoList {
             limit = LocalDate.of(year,month,date);
         }
 
-        public void toggleMyDay() {
-            if (myDay){myDay = false;}
-            else if(!myDay){myDay = true;}
+        public void setAlarm(int year, int month, int date, int time, int minute) {
+            alarmDate = LocalDate.of(year,month,date);
+            alarmTime = LocalTime.of(time, minute);
         }
 
+        public boolean isAlarmed(){
+            if (alarmTime == null) {return false;}
+            if (alarmDate.isAfter(LocalDate.now())) {return false;}
+            if (alarmTime.isAfter(LocalTime.now())) {return false;}
+            return true;
+        }
 
-
+        public void toggleInMyDay() {
+            if (inMyDay){
+                inMyDay = false;}
+            else {
+                inMyDay = true;}
+        }
     }
 }
