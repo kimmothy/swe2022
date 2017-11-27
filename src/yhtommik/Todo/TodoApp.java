@@ -11,8 +11,19 @@ public class TodoApp {
         return newList;
     }
 
+    public ArrayList<TodoList> getLists() {
+        return Lists;
+    }
+
     public void delList(TodoList list){
         Lists.remove(list);
+    }
+
+    public void printLists (){
+        for (TodoList list : Lists){
+            System.out.printf("- %s: %d%n",list.getName(), list.getLengthOfList());
+
+        }
     }
 
 

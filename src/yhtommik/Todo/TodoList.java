@@ -13,7 +13,6 @@ public class TodoList {
     private TodoTheme theme;
     private boolean hideCompleted;
 
-
     public TodoList(String name){
         this.name = name;
         theme = new TodoTheme();
@@ -26,6 +25,22 @@ public class TodoList {
         sort(copiedList);
         if (hideCompleted){ copiedList.removeIf(x -> x.isCompleted); }
         return copiedList;
+    }
+
+    public String getName() {return name;}
+
+    public int getLengthOfList(){
+        int length = 0;
+        for (TodoTask task : tasks){
+            length++;
+        }
+        return length;
+    }
+
+    public void printTasks(){
+        for (TodoTask task : tasks){
+            System.out.printf("[%s] %s %d. %d. %d. %s",task.printIsCompleted(), task.getName(), task.getLimitYear(), task.getLimitMonth(), task. getLimitDate(), task.printIsAlarmSet());
+        }
     }
 
     public void setName(String name){
@@ -83,6 +98,28 @@ public class TodoList {
 
         public String getName() {
             return name;
+        }
+
+        public String printIsCompleted(){
+            if (isCompleted) {return "O";}
+            else {return "-";}
+        }
+
+        public String printIsAlarmSet(){
+            if (alarmDate == null) {return "";}
+            else return "알람";
+        }
+
+        public int getLimitYear(){
+            return limit.getYear();
+        }
+
+        public int getLimitMonth(){
+            return limit.getMonthValue();
+        }
+
+        public int getLimitDate(){
+            return limit.getDayOfMonth();
         }
 
         public int compareTo (TodoTask other) {
@@ -158,6 +195,11 @@ public class TodoList {
                 inMyDay = false;}
             else {
                 inMyDay = true;}
+        }
+
+        public void setCompleted(){
+            if (isCompleted) {isCompleted = false;}
+            else {isCompleted = true;}
         }
     }
 }
