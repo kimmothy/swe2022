@@ -20,9 +20,9 @@ public class TodoMain {
             in.reset();
             app.printLists();
             String command = in.next();
-            if (command.contains("addList")){
+            if (command.startsWith("addList")){
                 TodoList newList = app.addList(in.next());
-            } else if (command.contains("list")){
+            } else if (command.startsWith("list")){
                 String listName = in.next();
                 for (TodoList list : app.getLists()){
                     if (list.getName().equals(listName)){
@@ -41,7 +41,7 @@ public class TodoMain {
             in.reset();
             listOnView.printTasks();
             String command = in.next();
-            if (command.contains("addTodo")){
+            if (command.startsWith("addTodo")){
                 TodoList.TodoTask newTask = listOnView.addTask(in.next());
                 //newTask.setLimit(in.next());
                 /*if (in.hasNext()){
@@ -49,7 +49,7 @@ public class TodoMain {
                  */
 
             }
-            if (command.contains("complete")){
+            if (command.startsWith("complete")){
                 for (TodoList.TodoTask task : listOnView.getList()){
                     if (task.getName() == in.next()){
                         task.setCompleted();
