@@ -1,11 +1,34 @@
 package yhtommik.Todo;
 
-import java.util.ArrayList;
+import java.io.*;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Scanner;
 
 public class TodoMain {
 
     private static Scanner in = new Scanner(System.in).useDelimiter("\\s");
+
+    private static TodoApp loadApp(){
+        try{
+            Path p = Paths.get("c:/JavaTest", "test.txt");
+            if (!Files.exists(p)) {
+                Files.createFile(p);
+                return new TodoApp();
+            }
+            ObjectInputStream load = new ObjectInputStream(Files.newInputStream(p));
+            TodoApp app = (TodoApp)load.readObject();
+            return app;
+
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+
+    }
 
     private static void viewList(TodoList list) {
         while (true) {
@@ -48,12 +71,8 @@ public class TodoMain {
 
 
     static public void main(String[] arg){
-        TodoApp app = new TodoApp();
+        TodoApp app = loadApp();
         TodoList listOnView = null;
-        TodoList Homework = app.addList("숙제");
-        TodoList.TodoTask america = Homework.addTask("미국사");
-        america.setLimit(17,12,30);
-        america.setAlarm(17,12,29,17,30);
 
 
 
@@ -71,6 +90,19 @@ public class TodoMain {
                         viewList(list);
                     }
                 }
+            }
+            if (command.equals("save")){
+                try {
+                    Path p = Paths.get("c:/JavaTest", "test.txt");
+                    if (!Files.exists(p)) Files.createFile(p);
+                    ObjectOutputStream save = new ObjectOutputStream(Files.newOutputStream(p));
+                    save.reset();
+                    save.writeObject(app);
+                }
+                catch (IOException e) {
+                    e.printStackTrace();
+                }
+
             }
         }
     }
