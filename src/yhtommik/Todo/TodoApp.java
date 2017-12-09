@@ -1,8 +1,9 @@
 package yhtommik.Todo;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
-public class TodoApp {
+public class TodoApp implements Serializable{
     private ArrayList<TodoList> Lists = new ArrayList<>();
 
     public TodoList addList(String name){

@@ -1,8 +1,9 @@
 package yhtommik.Todo;
 
+import java.io.Serializable;
 import java.util.Scanner;
 
-public class TodoTheme {
+public class TodoTheme implements Serializable{
     private enum Color {BLUE, RED, PURPLE, GREEN, SKY_BLUE};
     private enum Image {MOUNTAINS, BEACH, CABIN, FLIGHT, CITY, PLAIN};
 

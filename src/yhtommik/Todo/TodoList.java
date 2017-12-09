@@ -1,11 +1,12 @@
 package yhtommik.Todo;
 
+import java.io.Serializable;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Scanner;
 
-public class TodoList {
+public class TodoList implements Serializable{
     private enum SortFactor {BASIC, NAME, LIMIT, ADDED_DATE, IS_COMPLETED, IN_MY_DAY};
     private SortFactor sortFactor;
     private String name;
@@ -13,23 +14,23 @@ public class TodoList {
     private TodoTheme theme;
     private boolean hideCompleted;
 
-    public TodoList(String name){
+    TodoList(String name){
         this.name = name;
         theme = new TodoTheme();
         tasks = new ArrayList<>();
         sortFactor = SortFactor.BASIC;
     }
 
-    public ArrayList<TodoTask> getList( ) {
+    ArrayList<TodoTask> getList( ) {
         ArrayList<TodoTask> copiedList = new ArrayList<>(tasks);
         sort(copiedList);
         if (hideCompleted){ copiedList.removeIf(x -> x.isCompleted); }
         return copiedList;
     }
 
-    public String getName() {return name;}
+    String getName() {return name;}
 
-    public int getLengthOfList(){
+    int getLengthOfList(){
         int length = 0;
         for (TodoTask task : tasks){
             length++;
@@ -37,9 +38,9 @@ public class TodoList {
         return length;
     }
 
-    public void printTasks(){
+    void printTasks(){
         for (TodoTask task : tasks){
-            System.out.printf("[%s] %s %d. %d. %d. %s",task.printIsCompleted(), task.getName(), task.getLimitYear(), task.getLimitMonth(), task. getLimitDate(), task.printIsAlarmSet());
+            System.out.printf("[%s] %s %s. %s%n",task.isCompleted(), task.getName(), task.getLimit(), task.isAlarmSet());
         }
     }
 
@@ -52,13 +53,13 @@ public class TodoList {
         theme.setTheme();
     }
 
-    public TodoTask addTask(String name){
+    TodoTask addTask(String name){
         TodoTask newTask = new TodoTask(name);
         tasks.add(newTask);
         return newTask;
     }
 
-    public void setSortFactor() {
+    void setSortFactor() {
         for (SortFactor sortFactor : SortFactor.values()){//사용자에게 정렬 기준의 목록을 보여주고 선택받음
             System.out.println(sortFactor);
         }
@@ -76,12 +77,12 @@ public class TodoList {
             hideCompleted = true;}
     }
 
-    public void sort(ArrayList<TodoTask> tasks){
+    void sort(ArrayList<TodoTask> tasks){
         tasks.sort(TodoTask::compareTo);
     }
 
 
-    class TodoTask {
+    class TodoTask implements Serializable{
         private String name;
         private boolean inMyDay;
         private boolean isCompleted;
@@ -96,33 +97,27 @@ public class TodoList {
             isCompleted = false;
         }
 
-        public String getName() {
+        String getName() {
             return name;
         }
 
-        public String printIsCompleted(){
+        String isCompleted(){
             if (isCompleted) {return "O";}
             else {return "-";}
         }
 
-        public String printIsAlarmSet(){
+        String isAlarmSet(){
             if (alarmDate == null) {return "";}
             else return "알람";
         }
 
-        public int getLimitYear(){
-            return limit.getYear();
+        String getLimit(){
+            String day = "" + limit.getYear() + ". " + limit.getMonthValue() + ". " + limit.getDayOfMonth();
+            return  day;
         }
 
-        public int getLimitMonth(){
-            return limit.getMonthValue();
-        }
 
-        public int getLimitDate(){
-            return limit.getDayOfMonth();
-        }
-
-        public int compareTo (TodoTask other) {
+        int compareTo (TodoTask other) {
 
             if (sortFactor == SortFactor.ADDED_DATE) {
                 if (this.addedDate.isBefore(other.addedDate)) {
@@ -174,11 +169,11 @@ public class TodoList {
             this.name = name;
         }
 
-        public void setLimit(int year, int month, int date){
+        void setLimit(int year, int month, int date){
             limit = LocalDate.of(year,month,date);
         }
 
-        public void setAlarm(int year, int month, int date, int time, int minute) {
+        void setAlarm(int year, int month, int date, int time, int minute) {
             alarmDate = LocalDate.of(year,month,date);
             alarmTime = LocalTime.of(time, minute);
         }
@@ -186,8 +181,11 @@ public class TodoList {
         public boolean isAlarmed(){
             if (alarmTime == null) {return false;}
             if (alarmDate.isAfter(LocalDate.now())) {return false;}
+            return !alarmTime.isAfter(LocalTime.now());
+            /*
             if (alarmTime.isAfter(LocalTime.now())) {return false;}
             return true;
+            */
         }
 
         public void toggleInMyDay() {
@@ -197,7 +195,7 @@ public class TodoList {
                 inMyDay = true;}
         }
 
-        public void setCompleted(){
+        void setCompleted(){
             if (isCompleted) {isCompleted = false;}
             else {isCompleted = true;}
         }
